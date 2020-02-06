@@ -73,6 +73,7 @@ func check(err error) {
 func fetchDataHTTP(q url.Values) ([]byte, error) {
 
 	u, err := url.Parse(opendataURL)
+	// panic
 	check(err)
 
 	u.RawQuery = q.Encode()
@@ -119,6 +120,7 @@ func fetchData(year, fmisid string, c chan *[]byte) {
 	c <- &data
 }
 
+// might panic
 func writeXMLToFile(data *[]byte) {
 	dataFile := "failed.xml"
 	tmpPath := "._new_" + dataFile
@@ -228,6 +230,7 @@ func init() {
 
 }
 
+// Unused code
 func RequestLogger(targetMux http.Handler) http.Handler {
 	log.Printf("Request logger called")
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -286,13 +289,14 @@ func main() {
 		case xml := <-dataChan:
 			dates := readData(xml)
 
+			// unused code
 			d := &weatherData{}
 			d.Dates = dates
 			d.Year = year
 
 			d.FMISID = fmisid
 
-			fmt.Fprintf(w, "Data at %v year %s:\n\n", time.Now().Format("15:04:05"), year)
+			fmt.Fprintf(w, "Data at %v for %s year %s:\n\n", time.Now().Format("15:04:05"), fmisid, year)
 			printDates(&dates, w)
 		case <-time.After(5 * time.Second):
 			log.Errorf("channel read timeout")
@@ -310,6 +314,7 @@ func main() {
 	mux := mux.NewRouter()
 	mux.HandleFunc("/", Usage)
 	mux.HandleFunc("/weather/{id:[0-9]*}", ReturnWeatherData)
+	mux.HandleFunc("/weather", ReturnWeatherData)
 	http.Handle("/", mux)
 
 	// Allow http2 insecure
