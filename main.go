@@ -267,17 +267,20 @@ func main() {
 	log.Printf("cmdline fmisid: %s", *defaultFmiSid)
 
 	ReturnWeatherData := func(w http.ResponseWriter, r *http.Request) {
+		// need to be closed at somepoint/somewhere?
 		dataChan := make(chan *[]byte)
 		vars := mux.Vars(r)
 
 		log.Printf("Mux vars: %+v", vars)
 		fmisid := *defaultFmiSid
+		// validate
 		if vars["id"] != "" {
 			fmisid = vars["id"]
 		}
 
 		year := r.FormValue("year")
 		log.Debugf("get for year: %s", year)
+		// default to current?
 		if len(year) != 4 {
 			year = "2019"
 		}
